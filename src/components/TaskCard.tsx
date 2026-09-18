@@ -7,6 +7,7 @@ import { todayISO, formatTimeRange } from '@/lib/dates';
 export default function TaskCard({
   task,
   forceExpand,
+  hideDueBadge,
   onToggleTask,
   onToggleSubtask,
   onEdit,
@@ -15,6 +16,7 @@ export default function TaskCard({
   task: Task;
   category?: Category;
   forceExpand?: boolean;
+  hideDueBadge?: boolean;
   onToggleTask: (id: string, completed: boolean) => void;
   onToggleSubtask: (id: string, done: boolean) => void;
   onEdit: (id: string) => void;
@@ -26,7 +28,7 @@ export default function TaskCard({
   const doneCount = task.subtasks.filter((s) => s.done).length;
 
   function dueBadge() {
-    if (!task.due) return null;
+    if (!task.due || hideDueBadge) return null;
     const dueISO = task.due.slice(0, 10);
     let cls = '';
     if (!task.completed) {
