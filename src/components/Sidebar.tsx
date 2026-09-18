@@ -82,14 +82,14 @@ export default function Sidebar({
         </div>
 
         <div className="nav-group">
-          <button className={`nav-item${view === 'active' ? ' active' : ''}`} onClick={() => selectView('active')}>
+          <button className="nav-item" onClick={() => selectView('active')}>
             <span className="nav-left"><span className="label">Tasks</span></span>
             <span className="count">{openCount(null)}</span>
           </button>
-          <button className={`nav-item${view === 'calendar' ? ' active' : ''}`} onClick={() => selectView('calendar')}>
+          <button className="nav-item" onClick={() => selectView('calendar')}>
             <span className="nav-left"><span className="label">Calendar</span></span>
           </button>
-          <button className={`nav-item${view === 'done' ? ' active' : ''}`} onClick={() => selectView('done')}>
+          <button className="nav-item" onClick={() => selectView('done')}>
             <span className="nav-left"><span className="label">Done</span></span>
             <span className="count">{doneCount(null)}</span>
           </button>

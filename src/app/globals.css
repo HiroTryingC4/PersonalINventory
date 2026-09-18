@@ -21,6 +21,7 @@
     --bg: #15170F;
     --bg-elev: #1C1F16;
     --bg-card: #20241A;
+    --bg-active: #2B2F22;
     --ink: #EDEEE6;
     --ink-dim: #AEB2A2;
     --ink-faint: #767B6C;
@@ -34,6 +35,7 @@
   --bg: #15170F;
   --bg-elev: #1C1F16;
   --bg-card: #20241A;
+  --bg-active: #2B2F22;
   --ink: #EDEEE6;
   --ink-dim: #AEB2A2;
   --ink-faint: #767B6C;
