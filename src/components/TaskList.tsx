@@ -50,7 +50,7 @@ export default function TaskList({
   onDelete: (id: string) => void;
 }) {
   const filtered = tasks.filter(
-    (t) => (completed ? t.completed : true) && (!categoryFilter || t.categoryId === categoryFilter)
+    (t) => t.completed === completed && (!categoryFilter || t.categoryId === categoryFilter)
   );
 
   function renderTaskCards(list: Task[], c: Category, hideDueBadge: boolean) {
@@ -90,11 +90,11 @@ export default function TaskList({
             </div>
             {dateKeys.map((dateKey) => {
               const dateTasks = byDate.get(dateKey)!;
-              const hasOpenOverdue = dateKey !== '' && dateKey < todayISO() && dateTasks.some((t) => !t.completed);
+              const isOverdue = dateKey !== '' && dateKey < todayISO();
               const isToday = dateKey === todayISO();
               return (
                 <div key={dateKey || '__none__'} className="subgroup">
-                  <div className={`subgroup-label date${hasOpenOverdue ? ' overdue' : ''}${isToday ? ' today' : ''}`}>
+                  <div className={`subgroup-label date${isOverdue ? ' overdue' : ''}${isToday ? ' today' : ''}`}>
                     {dueDateLabel(dateKey)}
                   </div>
                   {renderTaskCards(dateTasks, c, true)}
@@ -152,12 +152,7 @@ export default function TaskList({
       </>
     );
   } else {
-    const catTasks = filtered.slice().sort((a, b) => {
-      if (a.completed !== b.completed) return a.completed ? 1 : -1;
-      return a.completed
-        ? (b.completedAt || '').localeCompare(a.completedAt || '')
-        : (a.due || '9999').localeCompare(b.due || '9999');
-    });
+    const catTasks = filtered.slice().sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'));
     isEmpty = catTasks.length === 0;
     body = renderCategoryGroups(catTasks, 'date');
   }
@@ -168,7 +163,7 @@ export default function TaskList({
         <div>
           <h2>{completed ? 'Done' : 'Tasks'}</h2>
           <div className="sub">
-            {completed ? 'Completed items, grouped by day' : 'All items, grouped by category and due date — completed ones stay checked off'}
+            {completed ? 'Completed items, grouped by day' : 'Open items, grouped by category and due date'}
           </div>
         </div>
         {!completed && <button className="btn-primary" onClick={onOpenAdd}>+ New task</button>}
