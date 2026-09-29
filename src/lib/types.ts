@@ -22,5 +22,6 @@ export type Task = {
   completed: boolean;
   completedAt: string | null;
   categoryId: string;
+  dailyTemplateId: string | null;
   subtasks: Subtask[];
 };

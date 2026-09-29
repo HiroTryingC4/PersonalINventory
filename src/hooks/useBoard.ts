@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { todayISO } from '@/lib/dates';
 import type { Category, Task } from '@/lib/types';
 
 export function useBoard() {
@@ -11,7 +12,7 @@ export function useBoard() {
   const refresh = useCallback(async () => {
     const [catsRes, tasksRes] = await Promise.all([
       fetch('/api/categories'),
-      fetch('/api/tasks'),
+      fetch(`/api/tasks?today=${todayISO()}`),
     ]);
     setCategories(await catsRes.json());
     setTasks(await tasksRes.json());
@@ -47,6 +48,18 @@ export function useBoard() {
     subtasks: { title: string }[];
   }) {
     await fetch('/api/tasks', { method: 'POST', body: JSON.stringify(input) });
+    await refresh();
+  }
+
+  async function addDailyTask(input: {
+    title: string;
+    categoryId: string;
+    subject: string;
+    startTime?: string;
+    endTime?: string;
+    subtasks: { title: string }[];
+  }) {
+    await fetch('/api/daily', { method: 'POST', body: JSON.stringify({ ...input, due: todayISO() }) });
     await refresh();
   }
 
@@ -93,6 +106,7 @@ export function useBoard() {
     addCategory,
     deleteCategory,
     addTask,
+    addDailyTask,
     updateTask,
     replaceSubtasks,
     toggleSubtask,

@@ -13,6 +13,13 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   const existing = await prisma.task.findUnique({ where: { id: params.id } });
   if (!existing) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
+  if (existing.dailyTemplateId) {
+    await prisma.dailyTemplate.update({
+      where: { id: existing.dailyTemplateId },
+      data: { subtaskTitles: incoming.map((s) => s.title) },
+    });
+  }
+
   const keepIds = incoming.filter((s) => s.id).map((s) => s.id as string);
 
   await prisma.$transaction([

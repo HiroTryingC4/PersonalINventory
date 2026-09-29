@@ -66,6 +66,7 @@ export default function TaskCard({
         <div className="task-body">
           <div className="task-title">{task.title}</div>
           <div className="task-meta">
+            {task.dailyTemplateId && <span className="badge-daily" title="Repeats daily">🔁 Daily</span>}
             {task.subject && <span className="tag">{task.subject}</span>}
             {dueBadge()}
             {formatTimeRange(task.startTime, task.endTime) && (

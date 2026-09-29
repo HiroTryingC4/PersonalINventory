@@ -24,6 +24,20 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     data.completedAt = body.completed ? new Date() : null;
   }
 
+  // Editing a daily instance's identity also updates the recurring template,
+  // so tomorrow's fresh instance reflects the edit too.
+  if (existing.dailyTemplateId) {
+    const templateData: Record<string, unknown> = {};
+    if (body.title !== undefined) templateData.title = body.title;
+    if (body.subject !== undefined) templateData.subject = body.subject || null;
+    if (body.startTime !== undefined) templateData.startTime = body.startTime || null;
+    if (body.endTime !== undefined) templateData.endTime = body.endTime || null;
+    if (body.categoryId !== undefined) templateData.categoryId = body.categoryId;
+    if (Object.keys(templateData).length) {
+      await prisma.dailyTemplate.update({ where: { id: existing.dailyTemplateId }, data: templateData });
+    }
+  }
+
   const task = await prisma.task.update({
     where: { id: params.id },
     data,
@@ -33,6 +47,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  await prisma.task.delete({ where: { id: params.id } });
+  const task = await prisma.task.findUnique({ where: { id: params.id }, select: { dailyTemplateId: true } });
+  if (task?.dailyTemplateId) {
+    // Deleting a daily instance stops the whole recurrence, not just today's copy.
+    await prisma.dailyTemplate.delete({ where: { id: task.dailyTemplateId } });
+  } else {
+    await prisma.task.delete({ where: { id: params.id } });
+  }
   return NextResponse.json({ ok: true });
 }

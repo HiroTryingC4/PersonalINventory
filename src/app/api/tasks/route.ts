@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { ensureDailyInstances } from '@/lib/daily';
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const completed = searchParams.get('completed');
   const categoryId = searchParams.get('categoryId');
+  const today = searchParams.get('today');
+
+  if (today) await ensureDailyInstances(today);
 
   const tasks = await prisma.task.findMany({
     where: {

@@ -29,6 +29,7 @@ export default function TaskModal({
     startTime: string;
     endTime: string;
     subtasks: SubRow[];
+    daily: boolean;
   }) => void | Promise<void>;
   onDelete?: () => void;
 }) {
@@ -40,11 +41,13 @@ export default function TaskModal({
   const [due, setDue] = useState(task?.due ? task.due.slice(0, 10) : defaultDue || '');
   const [startTime, setStartTime] = useState(task?.startTime || '');
   const [endTime, setEndTime] = useState(task?.endTime || '');
+  const [daily, setDaily] = useState(false);
   const [subtasks, setSubtasks] = useState<SubRow[]>(
     task?.subtasks.map((s) => ({ id: s.id, title: s.title })) || []
   );
   const [titleError, setTitleError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const isDailyInstance = !!task?.dailyTemplateId;
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -70,6 +73,7 @@ export default function TaskModal({
         startTime,
         endTime,
         subtasks: subtasks.filter((s) => s.title.trim()).map((s) => ({ id: s.id, title: s.title.trim() })),
+        daily,
       });
     } finally {
       setSubmitting(false);
@@ -109,10 +113,23 @@ export default function TaskModal({
           <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="e.g. Databases, FMG site" />
         </div>
 
-        <div className="field">
-          <label>Due date (optional)</label>
-          <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
-        </div>
+        {isDailyInstance ? (
+          <div className="field-note">🔁 Repeats daily — this task reappears each day until checked off.</div>
+        ) : mode === 'add' ? (
+          <div className="field checkbox-field">
+            <label>
+              <input type="checkbox" checked={daily} onChange={(e) => setDaily(e.target.checked)} />
+              {' '}Repeat daily (reappears each day until checked off, no fixed due date)
+            </label>
+          </div>
+        ) : null}
+
+        {!daily && (
+          <div className="field">
+            <label>Due date (optional)</label>
+            <input type="date" value={due} onChange={(e) => setDue(e.target.value)} />
+          </div>
+        )}
 
         <div className="field">
           <label>Time (optional)</label>

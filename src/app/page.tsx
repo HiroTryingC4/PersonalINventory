@@ -20,6 +20,7 @@ export default function Home() {
     addCategory,
     deleteCategory,
     addTask,
+    addDailyTask,
     updateTask,
     replaceSubtasks,
     toggleSubtask,
@@ -43,6 +44,7 @@ export default function Home() {
     startTime: string;
     endTime: string;
     subtasks: { id?: string; title: string }[];
+    daily: boolean;
   }) {
     if (modal?.mode === 'edit' && modal.taskId) {
       await updateTask(modal.taskId, {
@@ -54,6 +56,15 @@ export default function Home() {
         endTime: payload.endTime || null,
       });
       await replaceSubtasks(modal.taskId, payload.subtasks);
+    } else if (payload.daily) {
+      await addDailyTask({
+        title: payload.title,
+        categoryId: payload.categoryId,
+        subject: payload.subject,
+        startTime: payload.startTime,
+        endTime: payload.endTime,
+        subtasks: payload.subtasks,
+      });
     } else {
       await addTask({
         title: payload.title,
@@ -179,16 +190,24 @@ export default function Home() {
         />
       )}
 
-      {pendingDeleteId && (
-        <ConfirmDialog
-          title="Delete task?"
-          message="This will permanently delete the task and its subtasks."
-          confirmLabel="Delete"
-          danger
-          onConfirm={confirmDelete}
-          onCancel={() => setPendingDeleteId(null)}
-        />
-      )}
+      {pendingDeleteId && (() => {
+        const deleting = tasks.find((t) => t.id === pendingDeleteId);
+        const isDaily = !!deleting?.dailyTemplateId;
+        return (
+          <ConfirmDialog
+            title="Delete task?"
+            message={
+              isDaily
+                ? 'This is a daily task — deleting it stops it from repeating and removes it entirely.'
+                : 'This will permanently delete the task and its subtasks.'
+            }
+            confirmLabel="Delete"
+            danger
+            onConfirm={confirmDelete}
+            onCancel={() => setPendingDeleteId(null)}
+          />
+        );
+      })()}
 
       {categoryError && (
         <ConfirmDialog
