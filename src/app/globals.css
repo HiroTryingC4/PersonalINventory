@@ -222,6 +222,11 @@ button { cursor: pointer; }
 @media (max-width: 780px) {
   #app { flex-direction: column; }
 
+  /* iOS/Android auto-zoom the page on focusing any input under 16px — keep
+     all editable fields at 16px on mobile so opening the task modal doesn't
+     trigger it. */
+  input, select, textarea { font-size: 16px; }
+
   .mobile-topbar {
     display: flex; align-items: center; gap: 10px;
     position: sticky; top: 0; z-index: 40;
